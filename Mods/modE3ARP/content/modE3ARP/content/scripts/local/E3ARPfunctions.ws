@@ -52,3 +52,8 @@ function idleRotation( angle : float )
 		thePlayer.RaiseEvent ( 'Rotate' );
 	}
 }
+
+function E3ARPHerbLoot() : bool
+{
+  return theGame.GetInGameConfigWrapper().GetVarValue('E3ARPmodMain', 'E3ARPHerbLoot');
+}

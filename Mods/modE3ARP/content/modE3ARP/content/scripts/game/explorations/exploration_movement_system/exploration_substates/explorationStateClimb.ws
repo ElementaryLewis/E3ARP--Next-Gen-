@@ -473,10 +473,12 @@ class CExplorationStateClimb extends CExplorationStateAbstract
 		handIKqueuedL			= false;
 		handIKqueuedR			= false;
 		
+		m_ExplorationO.m_OwnerMAC.SetHandsIKOffsets( leftHandOffsetCur, rightHandOffsetCur );
+		
 		adjust2Dduration		= 0.0f;	
 		
 		
-		if ( thePlayer.IsHoldingItemInLHand() )
+		if ( thePlayer.IsHoldingItemInLHand() && !thePlayer.inv.ItemHasTag( thePlayer.GetSelectedItemId(), 'UI_Torch') )
 		{			
 			thePlayer.OnUseSelectedItem ( true );
 			restoreUsableItemLAtEnd	= true;		
@@ -690,6 +692,7 @@ class CExplorationStateClimb extends CExplorationStateAbstract
 			restoreUsableItemLAtEnd = false;
 			thePlayer.OnUseSelectedItem ();
 		}
+		
 		
 		thePlayer.SetBehaviorVariable( 'inJumpState', 0.f );
 		

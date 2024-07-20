@@ -289,6 +289,13 @@ class CExplorationStateJump extends CExplorationStateAbstract
 		
 		
 		
+		if(!theInput.LastUsedPCInput() && thePlayer.GetInputHandler().GetIsAltSignCasting() && theInput.IsActionPressed('CastSign'))
+		{
+			return false;
+		}
+		
+		
+		
 		
 		
 		if( m_CooldownCurF > 0.0f )
@@ -581,6 +588,11 @@ class CExplorationStateJump extends CExplorationStateAbstract
 	}
 	
 	
+	
+	private var petHoldTimer : float;
+	
+	
+	
 	function StateUpdateInactive( _Dt : float )
 	{
 		if( m_LockingJumpOnInteractionAreaB && thePlayer.IsInsideInteraction() && thePlayer.IsActionAllowed( EIAB_Interactions ) )
@@ -590,6 +602,22 @@ class CExplorationStateJump extends CExplorationStateAbstract
 		else if( m_LockingJumpOnHorseAreaB && thePlayer.IsMountingHorseAllowed( true ) )
 		{
 			m_InteractionLastLockingF	= m_ExplorationO.m_InputO.GetJumpTimeGap() + _Dt;
+			
+			
+			if(theInput.IsActionPressed('Jump'))
+			{
+				petHoldTimer += _Dt;
+				if( petHoldTimer > 0.5f )
+				{
+					thePlayer.TryPetHorse();
+					petHoldTimer = 0.f;
+				}
+			}	
+			else
+			{
+				petHoldTimer = 0.f;
+			}
+			
 		}
 		else
 		{
@@ -868,7 +896,7 @@ class CExplorationStateJump extends CExplorationStateAbstract
 		else if(jumpIdleWhenObstructed && m_ForceIdleJumpOnColliisonB && m_ExplorationO.m_CollisionManagerO.CheckCollisionsToNoStepOnInputDir( m_ForceIdleJumpDistFreeF, m_ForceIdleJumpHeightFreeF ) )
 		{
 			LogExploration("Collision forced idle jump" );
-			
+   
 			return EJT_Idle;
 		}
 		
@@ -981,7 +1009,7 @@ class CExplorationStateJump extends CExplorationStateAbstract
 		
 		if( prevStateName != 'StartFalling' )
 		{
-			thePlayer.DrainStamina(ESAT_Jump);
+			
 		}
 	}
 	

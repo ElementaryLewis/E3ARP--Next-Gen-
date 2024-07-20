@@ -24,6 +24,19 @@ state Exploration in CR4Player extends ExtendedMovable
 		super.OnEnterState(prevStateName);
 		
 		
+		lerpAmount = 0;
+		geraltIdleV = Vector(0.74,-0.38,0.345);
+		geraltRunV = Vector(0.74,-0.48,0.27);
+		geraltSprintLV = Vector(0.56,-0.82,0.24);
+		geraltSprintRV = Vector(0.25,-0.82,0.24);
+		geraltFocusV = Vector(0.6,0.4,0.45);
+		ciriIdleV = Vector(0.74,-0.38,0.34);
+		ciriRunV = Vector(0.74,-0.48,0.27);
+		ciriSprintLV = Vector(0.56,-0.61,0.2);
+		ciriSprintRV = Vector(0.25,-0.61,0.2);
+		
+		
+		
 		
 		theInput.SetContext( parent.GetExplorationInputContext() );
 		
@@ -271,6 +284,8 @@ state Exploration in CR4Player extends ExtendedMovable
 	
 	event OnGameCameraTick( out moveData : SCameraMovementData, dt : float )
 	{
+		
+		
 		if( super.OnGameCameraTick( moveData, dt ) )
 		{
 			return true;
@@ -307,7 +322,7 @@ state Exploration in CR4Player extends ExtendedMovable
 				{
 					return false;
 				}
-				else if( parent.movementLockType == PMLT_NoSprint || parent.movementLockType == PMLT_NoRun )
+				else if( (parent.movementLockType == PMLT_NoSprint || parent.movementLockType == PMLT_NoRun) && !parent.GetExplCamera() ) 
 				{
 					if ( parent.IsCombatMusicEnabled() || parent.GetPlayerMode().GetForceCombatMode() )
 						UpdateCameraInterior( moveData, dt );
@@ -328,6 +343,13 @@ state Exploration in CR4Player extends ExtendedMovable
 		}
 	}
 	
+	
+	private var cachedFocusMode, cachedSprint, sprintLeft, cachedEncumber : bool;
+	private var lerpAmount : float;
+	private var cachedMoveType : EPlayerMoveType;
+	private var geraltFocusV, geraltIdleV, geraltRunV, geraltSprintLV, geraltSprintRV, ciriIdleV, ciriRunV, ciriSprintRV, ciriSprintLV : Vector;
+	
+	
 	var cachedPos : Vector;
 	var constDamper : ConstDamper;
 	event OnGameCameraPostTick( out moveData : SCameraMovementData, dt : float )
@@ -337,6 +359,22 @@ state Exploration in CR4Player extends ExtendedMovable
 		
 		var playerVel : float;
 		var tempVel	: float;
+		
+		
+		var pos : Vector;
+		var sprintingAngle : float;
+		var encumberOffset : Vector;
+		
+		lerpAmount += dt/2;
+		if(cachedMoveType != parent.playerMoveType || cachedFocusMode != theGame.IsFocusModeActive())
+		{
+			lerpAmount = 0;
+		}
+		lerpAmount = ClampF(lerpAmount,0,1);
+		cachedMoveType = parent.playerMoveType;
+		cachedFocusMode = theGame.IsFocusModeActive();
+		cachedSprint = sprintLeft;
+		
 		
 		if ( !constDamper )
 		{
@@ -381,8 +419,138 @@ state Exploration in CR4Player extends ExtendedMovable
 				
 			DampVectorSpring( moveData.cameraLocalSpaceOffset, moveData.cameraLocalSpaceOffsetVel, moveData.cameraLocalSpaceOffset + Vector(0,0,-0.15f), 1.f, dt);
 		}
+
 		
-		parent.UpdateCameraSprint( moveData, dt );
+		if(parent.GetExplCamera())
+		{	
+			
+			pos = parent.GetWorldPosition();	
+		
+			moveData.pivotPositionController.SetDesiredPosition( pos , 15.f );
+			moveData.pivotDistanceController.SetDesiredDistance( 1.5f );			
+		
+			moveData.pivotPositionController.offsetZ = 1.15f;
+			
+			if(cachedEncumber != parent.HasBuff(EET_OverEncumbered))
+			{				
+				lerpAmount = 0;
+			}			
+			cachedEncumber = parent.HasBuff(EET_OverEncumbered);
+			if(cachedEncumber)
+				encumberOffset = Vector(-0.1,0.3,0);
+		
+			
+			
+			if( parent.climbingCam && parent.substateManager.GetStateCur() == 'Climb' )
+			{
+				theGame.GetGameCamera().ChangePivotPositionController('NGE_Climb');
+				theGame.GetGameCamera().ChangePivotDistanceController('ExplorationInterior');
+				
+				moveData.pivotDistanceController = theGame.GetGameCamera().GetActivePivotDistanceController();
+				moveData.pivotPositionController = theGame.GetGameCamera().GetActivePivotPositionController();
+				
+				DampVectorSpring( moveData.cameraLocalSpaceOffset, moveData.cameraLocalSpaceOffsetVel, Vector( 0.7f, -0.7f , 0.3f ), 0.5f, dt );
+			}
+			else
+			{
+				if(thePlayer.IsCiri())
+				{
+					if(cachedMoveType == PMT_Sprint)
+					{
+						sprintingAngle = AngleDistance(parent.GetHeading(), theCamera.GetCameraHeading());
+						if(sprintingAngle > 20)
+						{
+							sprintLeft = true;
+						}
+						else if(sprintLeft && sprintingAngle > 10)
+						{
+							sprintLeft = true;
+						}
+						else
+							sprintLeft = false;	
+
+						if(cachedSprint != sprintLeft)
+							lerpAmount = 0;
+					
+						if(sprintLeft && theInput.LastUsedGamepad())
+							moveData.cameraLocalSpaceOffset = LerpV(moveData.cameraLocalSpaceOffset, ciriSprintRV, lerpAmount);
+						else
+							moveData.cameraLocalSpaceOffset = LerpV(moveData.cameraLocalSpaceOffset, ciriSprintLV, lerpAmount);
+					}
+					else if(cachedMoveType == PMT_Run)
+					{
+						moveData.cameraLocalSpaceOffset = LerpV(moveData.cameraLocalSpaceOffset, ciriRunV, lerpAmount);
+						moveData.cameraLocalSpaceOffsetVel = Vector(0,0,0);						
+						sprintLeft = false;
+					}
+					else
+					{
+						moveData.cameraLocalSpaceOffset = LerpV(moveData.cameraLocalSpaceOffset, ciriIdleV, lerpAmount);
+						moveData.cameraLocalSpaceOffsetVel = Vector(0,0,0);						
+						sprintLeft = false;
+					}
+				}
+				else
+				{
+					if(cachedMoveType == PMT_Sprint)
+					{
+						sprintingAngle = AngleDistance(parent.GetHeading(), theCamera.GetCameraHeading());
+						if(sprintingAngle > 20)
+						{
+							sprintLeft = true;
+						}
+						else if(sprintLeft && sprintingAngle > 10)
+						{
+							sprintLeft = true;
+						}
+						else
+							sprintLeft = false;	
+							
+						if(cachedSprint != sprintLeft)
+							lerpAmount = 0;
+						
+						if(sprintLeft && theInput.LastUsedGamepad())
+						{
+							moveData.cameraLocalSpaceOffset = LerpV(moveData.cameraLocalSpaceOffset, geraltSprintRV, lerpAmount);
+						}
+						else
+						{
+							moveData.cameraLocalSpaceOffset = LerpV(moveData.cameraLocalSpaceOffset, geraltSprintLV, lerpAmount);
+						}
+						
+						moveData.cameraLocalSpaceOffsetVel = Vector(0,0,0);	
+					}
+					else if(cachedMoveType == PMT_Run)
+					{
+						if ( cachedFocusMode )
+							moveData.cameraLocalSpaceOffset = LerpV(moveData.cameraLocalSpaceOffset, geraltFocusV, lerpAmount);
+						else
+							moveData.cameraLocalSpaceOffset = LerpV(moveData.cameraLocalSpaceOffset, geraltRunV, lerpAmount);
+						moveData.cameraLocalSpaceOffsetVel = Vector(0,0,0);		
+						sprintLeft = false;
+					}
+					else
+					{
+						
+						if ( cachedFocusMode )
+							moveData.cameraLocalSpaceOffset = LerpV(moveData.cameraLocalSpaceOffset, geraltFocusV, lerpAmount);
+						else
+							moveData.cameraLocalSpaceOffset = LerpV(moveData.cameraLocalSpaceOffset, geraltIdleV + encumberOffset, lerpAmount);
+						moveData.cameraLocalSpaceOffsetVel = Vector(0,0,0);						
+						sprintLeft = false;
+					}
+				}
+				
+				if(thePlayer.IsInAir())
+					DampVectorSpring( moveData.cameraLocalSpaceOffset, moveData.cameraLocalSpaceOffsetVel, Vector( 0.0f, 0.0f, 0.5f ), 1.0f, dt );
+			}
+		}
+		else
+		{	
+			lerpAmount = 0;
+			parent.UpdateCameraSprint( moveData, dt );			
+		}
+		
 		
 		super.OnGameCameraPostTick( moveData, dt );
 	}
