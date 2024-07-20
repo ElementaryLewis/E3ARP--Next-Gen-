@@ -72,7 +72,7 @@ class CR4LocomotionPlayerControllerScript extends CR4LocomotionDirectControllerS
 		
 		player.SetBehaviorVariable( 'AIControlled', 0.f ); 
 		stopCheckEnabled = false;
-		
+	
 		return super.Activate();
 	}
 
@@ -92,7 +92,7 @@ class CR4LocomotionPlayerControllerScript extends CR4LocomotionDirectControllerS
 		movingAgentComponent.SetGameplayMoveDirection( 0.0f );
 		
 		stopCheckEnabled = false;
-		
+			
 		super.Deactivate();
 	}
 	
@@ -761,7 +761,7 @@ class CR4LocomotionPlayerControllerScript extends CR4LocomotionDirectControllerS
 	var startLeftTurnTimeStamp			: float;
 	var useRightTurnTimeStamp			: bool;
 	var useLeftTurnTimeStamp			: bool;
-	var currentAngleTime, angleTimestamp : float;
+	var currentAngleTime, angleTimestamp : float;	//E3ARP
 	
 	function CalculateMoveSpeed() : float
 	{
@@ -770,10 +770,10 @@ class CR4LocomotionPlayerControllerScript extends CR4LocomotionDirectControllerS
 		var rawRightJoyVec	: Vector;		
 		var tempInt			: int;		
 		var terrainAngles	: EulerAngles;		
-		var currentTime 	: float;		
+		var currentTime		: float;		
 		var forceWalkSpeed	: bool;		
 		var angleDist		: float = AngleNormalize180( AngleDistance( thePlayer.rawPlayerHeading, thePlayer.GetHeading() ) ); //E3ARP
-		var rotationAngle	: float;
+		var rotationAngle	: float;	//E3ARP
 		
 		
 		
@@ -808,6 +808,7 @@ class CR4LocomotionPlayerControllerScript extends CR4LocomotionDirectControllerS
 		
 		
 		
+		//E3ARP START
 		if ( theGame.IsFocusModeActive() )
 		{
 			if ( speed < 0.9f )
@@ -818,6 +819,7 @@ class CR4LocomotionPlayerControllerScript extends CR4LocomotionDirectControllerS
 		{
 			idleRotation(angleDist);
 		}
+		//E3ARP END
 		
 		if( thePlayer.CanSprint( speed ) )
 		{
@@ -867,7 +869,7 @@ class CR4LocomotionPlayerControllerScript extends CR4LocomotionDirectControllerS
 		}
 		
 		else if( !thePlayer.IsActionAllowed( EIAB_Sprint ) && thePlayer.IsActionAllowed( EIAB_RunAndSprint ) && !thePlayer.IsCombatMusicEnabled() )
-		{			
+		{	
 			if ( speed <= 0.f )
 			{
 				player.playerMoveType = PMT_Idle;
@@ -1036,7 +1038,7 @@ class CR4LocomotionPlayerControllerScript extends CR4LocomotionDirectControllerS
 							isCheckingCentered = false;				
 					
 						forceWalkSpeed = true;
-						speed = MinF( speed, speedWalkingMax );
+						speed = MinF( speed, speedWalkingMax );	//E3ARP
 					}
 					else
 						isCheckingCentered = false;
@@ -1048,13 +1050,13 @@ class CR4LocomotionPlayerControllerScript extends CR4LocomotionDirectControllerS
 				}
 				else
 				{
-					speed = MinF( speed, speedWalkingMax );
+					speed = MinF( speed, speedWalkingMax );	//E3ARP
 					player.playerMoveType = PMT_Walk;					
 				}
 			}
 			else
 			{
-				speed = MinF( speed, speedWalkingMax );
+				speed = MinF( speed, speedWalkingMax );	//E3ARP
 				player.playerMoveType = PMT_Walk;
 			}
 		}
@@ -1069,7 +1071,7 @@ class CR4LocomotionPlayerControllerScript extends CR4LocomotionDirectControllerS
 			else if(!thePlayer.IsActionAllowed( EIAB_Sprint ) && thePlayer.IsActionAllowed( EIAB_RunAndSprint ) && player.playerMoveType >= PMT_Walk)
 			{}
 			else
-			thePlayer.SetSprintToggle( false );
+				thePlayer.SetSprintToggle( false );
 		}
 		
 		
@@ -1200,5 +1202,5 @@ class CR4LocomotionPlayerControllerScript extends CR4LocomotionDirectControllerS
 		player.GetVisualDebug().AddArrow( 'heading5', player.GetWorldPosition(), player.GetWorldPosition() + VecFromHeading( useFacingWS ), 1.f, 0.4f, 0.2f, true, Color(0,0,255), true );
 		player.UpdateRequestedDirectionVariables( useHeadingWS, useFacingWS );
 	}
-	
+
 };

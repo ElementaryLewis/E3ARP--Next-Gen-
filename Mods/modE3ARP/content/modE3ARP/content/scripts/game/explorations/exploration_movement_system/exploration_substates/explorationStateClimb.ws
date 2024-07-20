@@ -478,11 +478,12 @@ class CExplorationStateClimb extends CExplorationStateAbstract
 		adjust2Dduration		= 0.0f;	
 		
 		
+		
 		if ( thePlayer.IsHoldingItemInLHand() && !thePlayer.inv.ItemHasTag( thePlayer.GetSelectedItemId(), 'UI_Torch') )
-		{			
+		{		
 			thePlayer.OnUseSelectedItem ( true );
-			restoreUsableItemLAtEnd	= true;		
-		}
+			restoreUsableItemLAtEnd	= true;					
+		}		
 		
 		
 		thePlayer.AbortSign();

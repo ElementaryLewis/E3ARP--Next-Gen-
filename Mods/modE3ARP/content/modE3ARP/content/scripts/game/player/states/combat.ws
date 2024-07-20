@@ -1018,7 +1018,7 @@ state Combat in CR4Player extends ExtendedMovable
 		var playerToTargetAngleDiff		: float;
 		var playerToRawAngleDiff		: float;
 		var playerToCamAngleDiff		: float;
-		var dodgeLeftOrRight			: float;
+		var dodgeLeftOrRight			: float;	//E3ARP
 		
 		var targetCapsuleRadius 		: float;
 		var perkStats 					: SAbilityAttributeValue;
@@ -1324,13 +1324,13 @@ state Combat in CR4Player extends ExtendedMovable
 		var i, rand, numOfAnims			: int;			
 
 		if ( dodgePlaylistFwd.Size() <= 0 )
-			dodgePlaylistFwd = CreatePlaylist(0);					//E3ARP
+			dodgePlaylistFwd = CreatePlaylist(0);		//E3ARP
 		
 		if ( dodgePlaylistFlipFwd.Size() <= 0 )
 			dodgePlaylistFlipFwd = CreatePlaylist(0);				//E3ARP
 
 		if ( dodgePlaylistBck.Size() <= 0 )
-			dodgePlaylistBck = CreatePlaylist(0);					//E3ARP
+			dodgePlaylistBck = CreatePlaylist(0);		//E3ARP
 	}
 	
 	private function CreatePlaylist( numOfAnims : int ) : array<float>

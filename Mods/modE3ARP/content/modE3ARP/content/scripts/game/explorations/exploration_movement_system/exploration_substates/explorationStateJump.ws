@@ -391,7 +391,7 @@ class CExplorationStateJump extends CExplorationStateAbstract
 	
 	
 	protected function StateEnterSpecific( prevStateName : name )	
-	{			
+	{	
 		GetProperJumpTypeParameters( prevStateName );
 		
 		SetSpeedOverrideCheck();
@@ -896,7 +896,6 @@ class CExplorationStateJump extends CExplorationStateAbstract
 		else if(jumpIdleWhenObstructed && m_ForceIdleJumpOnColliisonB && m_ExplorationO.m_CollisionManagerO.CheckCollisionsToNoStepOnInputDir( m_ForceIdleJumpDistFreeF, m_ForceIdleJumpHeightFreeF ) )
 		{
 			LogExploration("Collision forced idle jump" );
-   
 			return EJT_Idle;
 		}
 		

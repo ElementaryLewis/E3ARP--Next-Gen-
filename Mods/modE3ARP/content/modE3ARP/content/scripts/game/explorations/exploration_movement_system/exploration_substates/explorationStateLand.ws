@@ -885,7 +885,7 @@ class CExplorationStateLand extends CExplorationStateAbstract
 	private function GetLandRunCoefFromInput() : float
 	{
 		
-		if( m_ExplorationO.m_InputO.IsModuleConsiderable() /*thePlayer.GetIsWalking()*/ )
+		if( m_ExplorationO.m_InputO.IsModuleConsiderable() /*thePlayer.GetIsWalking()*/ )	 //E3ARP
 		
 		{
 			

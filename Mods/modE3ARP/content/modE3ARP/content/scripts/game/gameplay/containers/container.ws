@@ -567,13 +567,13 @@ import class W3Container extends W3LockableEntity
 			
 		if(skipInventoryPanel || usedByCiri || ((W3Herb)this) ) 
 		{
+			if ( E3ARPHerbLoot() ) //E3ARP Start
+			{
 			
 			if( !thePlayer.IsAnyWeaponHeld() && !thePlayer.IsHoldingItemInLHand() )
-			{
-				if ( E3ARPHerbLoot() ) //E3ARP Start
-					thePlayer.RaiseEvent('LootHerb'); //E3ARP End
-			}
+				thePlayer.RaiseEvent('LootHerb');
 			
+			}
 
 			TakeAllItems();
 			OnContainerClosed();			

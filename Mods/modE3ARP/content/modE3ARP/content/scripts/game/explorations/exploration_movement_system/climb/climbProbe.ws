@@ -1045,7 +1045,7 @@ class CClimbProbe
 		{
 			vaultCollision	= point;
 			height			= groundEndPoint.Z - vaultCollision.Z;
-			if( height > vaultHeight ) 
+			if( height > vaultHeight )
 			{
 				vaultingFound	= ECRV_Vault;
 				if( height >= heightTarget + heightOffsetToEndFall || height > heighAbsToEndFall )
