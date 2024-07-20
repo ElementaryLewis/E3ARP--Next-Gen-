@@ -1,0 +1,14 @@
+<?xml version="1.0" encoding="utf-8"?>
+<UserConfig>
+
+  <Group id="E3ARPmodMain" displayName="Mods.e3arp_name">
+  
+    <VisibleVars>
+	
+      <Var id="E3ARPHerbLoot" displayName="e3arp_herb_loot" displayType="TOGGLE" />
+	  
+    </VisibleVars>
+
+  </Group>
+  
+</UserConfig>
